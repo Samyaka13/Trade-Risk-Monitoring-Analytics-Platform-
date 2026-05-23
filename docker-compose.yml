@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: traderisk-db
+    environment:
+      POSTGRES_DB: traderisk
+      POSTGRES_USER: traderisk
+      POSTGRES_PASSWORD: traderisk_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U traderisk"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - traderisk-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: traderisk-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: jdbc:postgresql://postgres:5432/traderisk
+      DATABASE_USERNAME: traderisk
+      DATABASE_PASSWORD: traderisk_secret
+      JWT_SECRET: dGhpc0lzQVN1cGVyU2VjcmV0S2V5Rm9yVHJhZGVSaXNrUGxhdGZvcm1Kd3RUb2tlblNpZ25pbmc=
+    ports:
+      - "8080:8080"
+    networks:
+      - traderisk-network
+
+volumes:
+  postgres_data:
+
+networks:
+  traderisk-network:

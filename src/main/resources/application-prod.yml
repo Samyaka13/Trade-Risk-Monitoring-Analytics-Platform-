@@ -1,0 +1,31 @@
+# ============================================================
+# PROD Profile — PostgreSQL
+# ============================================================
+
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/traderisk}
+    username: ${DATABASE_USERNAME:traderisk}
+    password: ${DATABASE_PASSWORD:traderisk_secret}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: public
+
+  sql:
+    init:
+      mode: never
+
+logging:
+  level:
+    com.riskmanagement: INFO
+    org.hibernate.SQL: WARN
